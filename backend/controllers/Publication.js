@@ -41,37 +41,51 @@ exports.getOnePublication = (req, res, next) => {
 };
 
 exports.modifyPublication = (req, res, next) => {
-    const publicationObject = req.file
-        ? {
-              ...JSON.parse(req.body.publication),
-              imageUrl: `${req.protocol}://${req.get("host")}/images/${
-                  req.file.filename
-              }`,
-          }
-        : { ...req.body };
-    publication
-        .updateOne({ _id: req.params.id }, { ...publicationObject })
-        .then(() => res.status(200).json({ message: "Publication modifié!" }))
-        .catch((error) => res.status(401).json({ error }));
+    if (req.auth.role == 2 || req.auth.userId == req.body.userId) {
+        const publicationObject = req.file
+            ? {
+                  ...JSON.parse(req.body.publication),
+                  imageUrl: `${req.protocol}://${req.get("host")}/images/${
+                      req.file.filename
+                  }`,
+              }
+            : { ...req.body };
+        publication
+            .updateOne({ _id: req.params.id }, { ...publicationObject })
+            .then(() =>
+                res.status(200).json({ message: "Publication modifié!" })
+            )
+            .catch((error) => res.status(401).json({ error }));
+    } else {
+        return res
+            .status(401)
+            .json({ message: "Vous n'avez pas la permission" });
+    }
 };
 
 exports.deletePublication = (req, res, next) => {
-    publication
-        .findOne({ _id: req.params.id })
-        .then((element) => {
-            const filename = element.imageUrl.split("/images/")[1];
-            fs.unlink(`images/${filename}`, () => {
-                publication
-                    .deleteOne({ _id: req.params.id })
-                    .then(() => {
-                        res.status(200).json({
-                            message: "Publication supprimé !",
-                        });
-                    })
-                    .catch((error) => res.status(401).json({ error }));
-            });
-        })
-        .catch((error) => res.status(401).json({ error }));
+    if (req.auth.role == 2 || req.auth.userId == req.body.userId) {
+        publication
+            .findOne({ _id: req.params.id })
+            .then((element) => {
+                const filename = element.imageUrl.split("/images/")[1];
+                fs.unlink(`images/${filename}`, () => {
+                    publication
+                        .deleteOne({ _id: req.params.id })
+                        .then(() => {
+                            res.status(200).json({
+                                message: "Publication supprimé !",
+                            });
+                        })
+                        .catch((error) => res.status(401).json({ error }));
+                });
+            })
+            .catch((error) => res.status(401).json({ error }));
+    } else {
+        return res
+            .status(401)
+            .json({ message: "Vous n'avez pas la permission" });
+    }
 };
 
 exports.likePublication = (req, res) => {
