@@ -31,20 +31,22 @@
 .input {
     background-color: #d9d9d9;
     border: none;
-    border-radius: 20px;
+    border-radius: 15px;
     margin-bottom: 5%;
     padding: 15px;
     width: 15rem;
     font-family: "Lato", sans-serif;
+    box-shadow: 3px 2px 7px #9e9c9c;
 }
 .inputbouton {
     background-color: #d9d9d9;
     border: none;
-    border-radius: 20px;
+    border-radius: 15px;
     margin-bottom: 5%;
     padding: 15px;
     width: 10rem;
     font-family: "Lato", sans-serif;
     font-weight: bold;
+    box-shadow: 3px 2px 7px #9e9c9c;
 }
 </style>
