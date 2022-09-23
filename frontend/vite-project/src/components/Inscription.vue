@@ -1,21 +1,60 @@
-<script></script>
+<script>
+//import { mapState } from "vuex";
+export default {
+    name: "Inscription",
+
+    data: function () {
+        return {
+            prenom: "",
+            nom: "",
+            email: "",
+            motDePasse: "",
+        };
+    },
+
+    //...mapState(["status"]),
+};
+
+// je recupere les données avec un data
+//ensuite je fais une methodes
+</script>
 
 <template>
     <form class="bloc2inscrpt" method="post">
         <label for="Inscription">
-            <input type="submit" class="inputbouton" value="INSCRIPTION" />
+            <input
+                type="submit"
+                @submit="createAcount()"
+                class="inputbouton"
+                value="INSCRIPTION"
+            />
         </label>
         <label for="Nom">
-            <input type="text" class="input" placeholder="Nom" />
+            <input type="text" v-model="nom" class="input" placeholder="Nom" />
         </label>
         <label for="Prenom">
-            <input type="text" class="input" placeholder="Prenom" />
+            <input
+                type="text"
+                v-model="prenom"
+                class="input"
+                placeholder="Prenom"
+            />
         </label>
         <label for="Adresse mail">
-            <input type="email" class="input" placeholder="Adresse mail" />
+            <input
+                type="email"
+                v-model="email"
+                class="input"
+                placeholder="Adresse mail"
+            />
         </label>
         <label for="Mot de passe">
-            <input type="password" class="input" placeholder="Mot de passe" />
+            <input
+                type="password"
+                v-model="motDePasse"
+                class="input"
+                placeholder="Mot de passe"
+            />
         </label>
     </form>
 </template>
@@ -48,5 +87,6 @@
     font-family: "Lato", sans-serif;
     font-weight: bold;
     box-shadow: 3px 2px 7px #9e9c9c;
+    cursor: pointer;
 }
 </style>

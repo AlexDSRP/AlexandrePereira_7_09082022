@@ -49,8 +49,7 @@ export default {
 .creerPubli {
     display: flex;
     flex-direction: column;
-    background-color: rgba(255, 215, 215, 0.5);
-
+    background-color: rgba(255, 215, 215, 0.6);
     align-items: center;
     border-radius: 20px;
     margin-left: 18%;
@@ -90,7 +89,7 @@ export default {
 }
 .iconeimg {
     font-size: 25px;
-    margin: 10% 10% 10% 10%;
+    margin: 5% 10% 5% 10%;
 }
 #bouton {
     display: none;

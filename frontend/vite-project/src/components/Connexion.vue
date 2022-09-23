@@ -44,5 +44,6 @@
     font-family: "Lato", sans-serif;
     font-weight: bold;
     box-shadow: 3px 2px 7px #9e9c9c;
+    cursor: pointer;
 }
 </style>

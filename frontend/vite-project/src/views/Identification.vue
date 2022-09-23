@@ -34,7 +34,7 @@ body {
     width: 100%;
 }
 .identification {
-    background-color: rgba(234, 51, 35, 0.8);
+    background-color: rgba(234, 51, 35, 0.7);
     height: 100vh;
 }
 #container1 {

@@ -11,12 +11,18 @@ export default {
 };
 </script>
 <template>
-    <header>
-        <Header2 />
-    </header>
-    <section id="container1">
-        <CreatePubli />
-        <!--<Publication />-->
-    </section>
+    <body>
+        <header>
+            <Header2 />
+        </header>
+        <section id="container1">
+            <CreatePubli />
+            <Publication />
+        </section>
+    </body>
 </template>
-<style></style>
+<style>
+body {
+    background-color: rgba(47, 48, 60, 0.8);
+}
+</style>

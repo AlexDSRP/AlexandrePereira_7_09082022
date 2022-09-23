@@ -13,10 +13,14 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 /* import specific icons */
-import { faImage, faPaperPlane } from "@fortawesome/free-regular-svg-icons";
+import {
+    faImage,
+    faPaperPlane,
+    faHeart,
+} from "@fortawesome/free-regular-svg-icons";
 
 /* add icons to the library */
-library.add(faImage, faPaperPlane);
+library.add(faImage, faPaperPlane, faHeart);
 
 const router = createRouter({
     history: createWebHistory(),
