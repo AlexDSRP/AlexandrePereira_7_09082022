@@ -1,6 +1,7 @@
 import { createApp } from "vue";
 import "./style.css";
 import App from "./App.vue";
+import VueCookies from "vue-cookies";
 
 import Identification from "./views/Identification.vue";
 import Accueil from "./views/Accueil.vue";
@@ -40,5 +41,6 @@ const router = createRouter({
 
 createApp(App)
     .use(router)
+    .use(VueCookies)
     .component("font-awesome-icon", FontAwesomeIcon)
     .mount("#app");

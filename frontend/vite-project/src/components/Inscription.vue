@@ -1,36 +1,57 @@
 <script>
-//import { mapState } from "vuex";
 export default {
     name: "Inscription",
 
+    // je recupere les données avec un data
     data: function () {
         return {
-            prenom: "",
             nom: "",
+            prenom: "",
             email: "",
             motDePasse: "",
         };
     },
 
-    //...mapState(["status"]),
-};
+    computed: {},
 
-// je recupere les données avec un data
-//ensuite je fais une methodes
+    //ensuite je fais une methodes avec la fonction "createAccount()"
+    //dans ma fonction je ferai un fetch
+    methods: {
+        createAccount(event) {
+            event.preventDefault();
+            const descriptionForm = document.querySelector(".bloc2inscrpt");
+            const formData = {
+                name: this.nom,
+                firstName: this.prenom,
+                email: this.email,
+                password: this.motDePasse,
+            };
+            fetch("http://localhost:3000/api/auth/signup", {
+                method: "Post",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            })
+                .then((response) => response.json())
+                .then((data) => this.$router.push({ name: "Accueil" }))
+                .catch((error) => console.log(error));
+        },
+    },
+};
 </script>
 
 <template>
-    <form class="bloc2inscrpt" method="post">
+    <form class="bloc2inscrpt" @submit="createAccount" method="post">
         <label for="Inscription">
-            <input
-                type="submit"
-                @submit="createAcount()"
-                class="inputbouton"
-                value="INSCRIPTION"
-            />
+            <input type="submit" class="inputbouton" value="INSCRIPTION" />
         </label>
         <label for="Nom">
-            <input type="text" v-model="nom" class="input" placeholder="Nom" />
+            <input
+                type="text"
+                v-model="nom"
+                class="input"
+                placeholder="Nom"
+                required
+            />
         </label>
         <label for="Prenom">
             <input

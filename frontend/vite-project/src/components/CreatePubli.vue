@@ -1,15 +1,52 @@
 <script>
+import { includeBooleanAttr } from "@vue/shared";
+
 export default {
-    name: "iconeimg",
+    name: "createPost",
+
+    data: function () {
+        return {
+            commentaire: "",
+            image: null,
+        };
+    },
+    methods: {
+        imageForm(event) {
+            this.image = event.target.files[0];
+            console.log(this.image);
+        },
+
+        createPost(event) {
+            event.preventDefault();
+            const dataForm = new FormData();
+            dataForm.append("commentaire", this.commentaire);
+            dataForm.append("image", this.image);
+            console.log(dataForm);
+
+            fetch("http://localhost:3000/api/publication", {
+                method: "Post",
+                credentials: "include",
+                body: dataForm,
+            })
+                .then((response) => {
+                    response.json();
+                })
+                .then((data) => {
+                    console.log(data);
+                })
+                .catch((error) => console.log(error));
+        },
+    },
 };
 </script>
 <template>
-    <form class="creerPubli" method="post">
+    <form class="creerPubli" @submit="createPost" method="post">
         <div class="bloc1">
             <label for="commentaires">
                 <input
                     type="text"
                     name="commentaires"
+                    v-model="commentaire"
                     class="commentaire"
                     placeholder="Commentaires..."
                 />
@@ -23,6 +60,7 @@ export default {
                 />
                 <input
                     type="file"
+                    @change="imageForm"
                     name="inserezimage"
                     class="commentaire"
                     id="comment"
@@ -55,6 +93,7 @@ export default {
     margin-left: 18%;
     margin-right: 18%;
 }
+
 .bloc1 {
     display: flex;
     flex-direction: column;
