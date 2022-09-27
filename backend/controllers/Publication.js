@@ -10,17 +10,15 @@ exports.getAllPublication = (req, res, next) => {
 };
 
 exports.createPublication = (req, res, next) => {
-    const publicationObject = JSON.parse(req.body.publication);
-    delete publicationObject._id;
-    delete publicationObject._userId;
-    const newPublication = new Publication({
-        ...publicationObject,
+    const newPublication = new publication({
+        commentaire: req.body.commentaire,
         userId: req.auth.userId,
-        imageUrl: `${req.protocol}://${req.get("host")}/images/${
+        image: `${req.protocol}://${req.get("host")}/images/${
             req.file.filename
         }`,
         likes: 0,
         dislikes: 0,
+        usersLiked: [],
     });
 
     newPublication
