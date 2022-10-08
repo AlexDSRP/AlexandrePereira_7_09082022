@@ -17,7 +17,7 @@ export default {
     methods: {
         connexionAccount(event) {
             event.preventDefault();
-            const descriptionForm = document.querySelector(".bloc1co");
+            //const descriptionForm = document.querySelector(".bloc1co");
             const formData = {
                 email: this.email,
                 password: this.motDePasse,
@@ -31,10 +31,11 @@ export default {
                     if (response.status === 200) {
                         this.$router.push({ name: "Accueil" });
                     }
-                    response.json();
+                    return response.json();
                 })
                 .then((data) => {
-                    $cookies.set("token", data.token);
+                    console.log(data);
+                    localStorage.setItem("token", data.token);
                 })
                 .catch((error) => console.log(error));
         },

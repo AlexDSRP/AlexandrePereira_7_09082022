@@ -1,6 +1,4 @@
 <script>
-import { includeBooleanAttr } from "@vue/shared";
-
 export default {
     name: "createPost",
 
@@ -19,17 +17,23 @@ export default {
         createPost(event) {
             event.preventDefault();
             const dataForm = new FormData();
+            const name = localStorage.getItem("name");
+            const firstName = localStorage.getItem("firstName");
             dataForm.append("commentaire", this.commentaire);
             dataForm.append("image", this.image);
+            dataForm.append("name", name);
+            dataForm.append("firstName", firstName);
             console.log(dataForm);
 
             fetch("http://localhost:3000/api/publication", {
                 method: "Post",
-                credentials: "include",
+                headers: {
+                    Authorization: "Bearer " + localStorage.getItem("token"),
+                },
                 body: dataForm,
             })
                 .then((response) => {
-                    response.json();
+                    return response.json();
                 })
                 .then((data) => {
                     console.log(data);

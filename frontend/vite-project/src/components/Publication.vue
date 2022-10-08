@@ -1,29 +1,75 @@
-<script></script>
+<script>
+import dayjs from "dayjs";
+import DetailPost from "./DetailPost.vue";
+
+export default {
+    name: "Publication",
+    data: function () {
+        return {
+            posts: [],
+            id: [],
+            commentaire: "",
+            dayjs,
+            isopen: false,
+        };
+    },
+    props: {
+        commentaire: String,
+        image: String,
+    },
+    //faire un fetch pour recuperer le post
+    //fetch("http://localhost:3000/api/publication")
+    mounted() {
+        fetch("http://localhost:3000/api/publication", {
+            headers: {
+                Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+        })
+            .then((response) => {
+                return response.json();
+            })
+            .then((data) => {
+                console.log(data);
+                this.posts = data;
+            })
+            .catch((error) => console.log(error));
+    },
+    methods: {
+        pushPost() {
+            this.isopen = !this.isopen;
+            console.log(this.isopen);
+            window.scrollTo({ top: 0 });
+        },
+    },
+    components: { DetailPost },
+};
+</script>
 <template>
-    <section id="container2">
-        <div class="infoPublic">
-            <h1>{{ nom }}Alexandre Pereira</h1>
-            <div class="date">{{ date }}22 septembre à 17h00</div>
-        </div>
-        <div class="image">
-            {{ image
-            }}<img class="images" src="Images/fondProjet7.jpeg" alt="images" />
-        </div>
-        <div class="optionPublic">
-            <div class="like">
-                <font-awesome-icon icon="fa-regular fa-heart" />
+    <div class="container">
+        <DetailPost :class="isopen ? 'DetailPost' : 'DetailPostHidden'" />
+        <section v-for="data in posts" v-on:click="pushPost" id="container2">
+            <div class="infoPublic">
+                <h1>{{ data.name }}</h1>
+                <p class="date">
+                    {{ dayjs(data.date).format("DD-MM-YYYY mm:ss") }}
+                </p>
             </div>
-            <div class="modifSupp">
-                <div class="modifier">modifier</div>
-                <div class="supprimer">supprimer</div>
+            <div class="image">
+                <div class="commentaires" :com="commentaire">
+                    {{ data.commentaire }}
+                </div>
+                <img class="images" :src="data.image" alt="images" />
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 </template>
 
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Lato&display=swap");
 
+.container {
+    position: relative;
+}
 #container2 {
     display: flex;
     flex-direction: column;
@@ -42,11 +88,18 @@
 .images {
     width: 70%;
     border-radius: 20px;
+
+    box-shadow: 3px 2px 7px rgb(47, 48, 60);
+}
+.commentaires {
+    font-family: "Lato", sans-serif;
 }
 .image {
     display: flex;
-    justify-content: center;
     margin-top: 3%;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 4%;
 }
 .optionPublic {
     margin-top: 20px;
@@ -58,20 +111,13 @@
     font-size: 1.5em;
     margin-right: 27rem;
 }
-.modifSupp {
-    display: flex;
+.DetailPostHidden {
+    display: none;
 }
-.modifier {
-    margin-right: 10%;
-    background-color: #4e5166;
-    padding: 5px 10px 5px 10px;
-    border-radius: 5px;
-    box-shadow: 3px 2px 7px #4e5166;
-}
-.supprimer {
-    background-color: #4e5166;
-    padding: 5px 10px 5px 10px;
-    border-radius: 5px;
-    box-shadow: 3px 2px 7px #4e5166;
+.DetailPost {
+    width: 100vw;
+    height: 100vh;
+    position: sticky;
+    overflow: hidden;
 }
 </style>

@@ -32,7 +32,7 @@ export default {
                 body: JSON.stringify(formData),
             })
                 .then((response) => response.json())
-                .then((data) => this.$router.push({ name: "Accueil" }))
+                .then((data) => this.$router.push({ name: "Identification" }))
                 .catch((error) => console.log(error));
         },
     },
