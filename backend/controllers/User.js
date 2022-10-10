@@ -27,18 +27,20 @@ exports.login = (req, res, next) => {
     console.log(req.body);
     User.findOne({ email: req.body.email })
         .then((user) => {
+            console.log(user);
             bcrypt
                 .compare(req.body.password, user.password)
-                .then((valid) => {
-                    if (!valid) {
-                        return res.status(401).json({
-                            message: "Paire login/mot de passe incorrecte",
-                        });
-                    }
+                .then(() => {
                     res.status(200).json({
                         userId: user._id,
+                        name: user.name,
+                        firstName: user.firstName,
+
                         token: jwt.sign(
-                            { userId: user._id, role: user.roleId },
+                            {
+                                userId: user._id,
+                                role: user.roleId,
+                            },
                             process.env.TOKEN,
                             { expiresIn: "24h" }
                         ),

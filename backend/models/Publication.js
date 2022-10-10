@@ -5,8 +5,10 @@ const publicationSchema = mongoose.Schema({
     commentaire: { type: String, required: true },
     image: { type: String, required: true },
     likes: { type: Number, required: true },
-    dislikes: { type: Number, required: true },
     usersLiked: { type: Array, required: true, default: Array },
+    date: { type: String, required: true },
+    name: { type: String, required: true },
+    firstName: { type: String, required: true },
 });
 
 module.exports = mongoose.model("Publication", publicationSchema);

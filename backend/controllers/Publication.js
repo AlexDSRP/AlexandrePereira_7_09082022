@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const fs = require("fs");
 
 exports.getAllPublication = (req, res, next) => {
+    console.log("getAll");
     publication
         .find()
         .then((publication) => res.status(200).json(publication))
@@ -17,8 +18,10 @@ exports.createPublication = (req, res, next) => {
             req.file.filename
         }`,
         likes: 0,
-        dislikes: 0,
         usersLiked: [],
+        date: new Date(),
+        name: req.body.name,
+        firstName: req.body.firstName,
     });
 
     newPublication

@@ -1,6 +1,5 @@
 <script>
 import dayjs from "dayjs";
-import DetailPost from "./DetailPost.vue";
 
 export default {
     name: "Publication",
@@ -8,15 +7,13 @@ export default {
         return {
             posts: [],
             id: [],
-            commentaire: "",
             dayjs,
             isopen: false,
+            comment: "",
+            like: 0,
         };
     },
-    props: {
-        commentaire: String,
-        image: String,
-    },
+
     //faire un fetch pour recuperer le post
     //fetch("http://localhost:3000/api/publication")
     mounted() {
@@ -35,41 +32,102 @@ export default {
             .catch((error) => console.log(error));
     },
     methods: {
-        pushPost() {
+        modifPublication(e) {
             this.isopen = !this.isopen;
-            console.log(this.isopen);
-            window.scrollTo({ top: 0 });
+            const element = e.target;
+            const post = element.closest("#container2");
+            const comm = post.querySelector(".comm");
+            const postId = post
+                .querySelector(".infoPublic")
+                .getAttribute("postId");
+            localStorage.setItem("postId", postId);
+
+            console.log(post, comm, postId);
+        },
+        envoyer(e) {
+            e.preventDefault();
+            const id = localStorage.getItem("postId");
+            const dataForm = new FormData();
+            dataForm.append("commentaire", this.comment);
+            console.log(dataForm);
+            fetch(`http://localhost:3000/api/publication/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-type": "application/json",
+                    Authorization: "Bearer" + localStorage.getItem("token"),
+                },
+                body: dataForm,
+            });
+        },
+        /*suppPublication() {
+            const id = localStorage.getItem("postId");
+            const dataForm = new FormData();
+            dataForm.append("commentaire", this.commentaire);
+            dataForm.append("image", this.image);
+            console.log(dataForm);
+            fetch(`http://localhost:3000/api/publication/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-type": "application/json",
+                    Authorization: "Bearer" + localStorage.getItem("token"),
+                },
+                body: dataForm,
+            })
+                .then(localStorage.clear())
+                .then(this.$router.push("Accueil"))
+                .catch((error) => {
+                    error;
+                });
+        },*/
+        likes() {
+            const id = localStorage.getItem("postId");
+            const dataForm = new FormData();
+            dataForm.append("likes", this.like);
+            console.log(like);
+            fetch(`http://localhost:3000/api/publication/${id}/like`, {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json",
+                    Authorization: "Bearer" + localStorage.getItem("token"),
+                },
+                body: dataForm,
+            });
         },
     },
-    components: { DetailPost },
 };
 </script>
 <template>
-    <div class="container">
-        <DetailPost :class="isopen ? 'DetailPost' : 'DetailPostHidden'" />
-        <section v-for="data in posts" v-on:click="pushPost" id="container2">
-            <div class="infoPublic">
-                <h1>{{ data.name }}</h1>
-                <p class="date">
-                    {{ dayjs(data.date).format("DD-MM-YYYY mm:ss") }}
-                </p>
+    <form :class="isopen ? 'comm' : 'texte'">
+        <input type="text" v-model="comment" />
+        <input type="submit" @submit="envoyer" />
+    </form>
+
+    <section v-for="data in posts" id="container2">
+        <div class="infoPublic" :postId="data._id">
+            <h1>{{ data.name }}</h1>
+            <p class="date">
+                {{ dayjs(data.date).format("DD-MM-YYYY mm:ss") }}
+            </p>
+        </div>
+        <div class="image">
+            <div class="comm" :com="commentaire">
+                {{ data.commentaire }}
             </div>
-            <div class="image">
-                <div class="commentaires" :com="commentaire">
-                    {{ data.commentaire }}
-                </div>
-                <img class="images" :src="data.image" alt="images" />
-            </div>
-        </section>
-    </div>
+            <img class="images" :src="data.image" alt="images" />
+        </div>
+        <div class="detailpost">
+            <div @click="modifPublication" class="modifier">modifier</div>
+            <div @click="suppPublication" class="supprimer">supprimer</div>
+            <button type="submit" class="like" @click="likes">
+                <font-awesome-icon icon="fa-regular fa-heart" />
+            </button>
+        </div>
+    </section>
 </template>
 
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Lato&display=swap");
 
-.container {
-    position: relative;
-}
 #container2 {
     display: flex;
     flex-direction: column;
@@ -88,36 +146,47 @@ export default {
 .images {
     width: 70%;
     border-radius: 20px;
-
     box-shadow: 3px 2px 7px rgb(47, 48, 60);
+    margin-top: 3%;
 }
-.commentaires {
+.comm {
     font-family: "Lato", sans-serif;
+}
+.texte {
+    display: none;
 }
 .image {
     display: flex;
     margin-top: 3%;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 4%;
+    margin-bottom: 3%;
 }
-.optionPublic {
-    margin-top: 20px;
-    justify-content: space-between;
+.detailpost {
     display: flex;
-    margin-bottom: 2%;
+    flex-direction: row-reverse;
+    margin-bottom: 3%;
+}
+.modifier {
+    background-color: #4e5166;
+    margin-left: 10px;
+    padding: 5px 10px 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.supprimer {
+    background-color: #4e5166;
+    margin-left: 10px;
+    padding: 5px 10px 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
 }
 .like {
+    color: rgb(47, 48, 60);
+    margin-top: 4px;
     font-size: 1.5em;
-    margin-right: 27rem;
-}
-.DetailPostHidden {
-    display: none;
-}
-.DetailPost {
-    width: 100vw;
-    height: 100vh;
-    position: sticky;
-    overflow: hidden;
+    cursor: pointer;
+    background-color: rgba(255, 215, 215, 0);
+    border: none;
 }
 </style>

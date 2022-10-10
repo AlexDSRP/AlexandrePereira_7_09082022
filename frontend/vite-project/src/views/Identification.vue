@@ -27,7 +27,7 @@ export default {
     </body>
 </template>
 
-<style scoped>
+<style>
 body {
     background-image: url(images/fondProjet7.jpeg);
     height: 100vh;

@@ -11,18 +11,18 @@ export default {
 };
 </script>
 <template>
-    <body>
+    <div class="body1">
         <header>
             <Header2 />
         </header>
-        <section id="container1">
+        <section id="container">
             <CreatePubli />
             <Publication />
         </section>
-    </body>
+    </div>
 </template>
 <style>
-body {
-    background-color: rgba(47, 48, 60, 0.8);
+.body1 {
+    background-color: rgba(47, 48, 60, 0.9);
 }
 </style>
