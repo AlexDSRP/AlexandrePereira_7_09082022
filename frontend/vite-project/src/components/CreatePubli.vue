@@ -42,7 +42,7 @@ export default {
                     return response.json();
                 })
                 .then((data) => {
-                    this.$emit("createNewPosts", data.publication);
+                    this.$emit("addPosts", data.publication);
                 })
                 .catch((error) => console.log(error));
         },

@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
 
 const publicationCtrl = require("../controllers/Publication");
 const midAuth = require("../middleware/auth");
@@ -19,7 +20,12 @@ router.put(
     midMulter,
     publicationCtrl.modifyPublication
 );
-router.delete("/publication/:id", midAuth, publicationCtrl.deletePublication);
+router.delete(
+    "/publication/:id",
+    // multer().none(),
+    midAuth,
+    publicationCtrl.deletePublication
+);
 router.post("/publication/like/:id", midAuth, publicationCtrl.likePublication);
 
 module.exports = router;

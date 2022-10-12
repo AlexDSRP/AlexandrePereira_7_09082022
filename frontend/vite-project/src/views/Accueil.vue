@@ -16,11 +16,30 @@ export default {
     },
 
     methods: {
+        likePost(id, like) {
+            this.posts.filter((post) => {
+                if (post._id === id) {
+                    console.log(post._id === id);
+                    post.likes += like;
+                    console.log(post.usersLiked.length);
+                }
+            });
+        },
         addPosts(newPost) {
             this.posts.push(newPost);
+            this.posts.sort(function sortByDate(a, b) {
+                return new Date(b.date) - new Date(a.date);
+            });
         },
         deletePost(index) {
             this.posts.splice(index, 1);
+        },
+        updatePost(id, commentaire) {
+            this.posts.filter((post) => {
+                if (post._id === id) {
+                    post.commentaire = commentaire;
+                }
+            });
         },
     },
 
@@ -39,8 +58,10 @@ export default {
                     return response.json();
                 })
                 .then((data) => {
-                    console.log(data);
                     this.posts = data;
+                    this.posts.sort(function sortByDate(a, b) {
+                        return new Date(b.date) - new Date(a.date);
+                    });
                 })
                 .catch((error) => console.log(error));
         }
@@ -53,8 +74,13 @@ export default {
             <Header2 />
         </header>
         <section id="container">
-            <CreatePubli @createNewPosts="addPosts" />
-            <Publication @deletePost="deletePost" :posts="posts" />
+            <CreatePubli @addPosts="addPosts" />
+            <Publication
+                @deletePost="deletePost"
+                :posts="posts"
+                @updatePost="updatePost"
+                @likePost="likePost"
+            />
         </section>
     </body>
 </template>

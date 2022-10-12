@@ -10,8 +10,10 @@ export default {
             isopen: false,
             comment: "",
             like: "",
+            arrayLike: null,
         };
     },
+
     props: ["posts"],
     methods: {
         modifPublication(e) {
@@ -27,7 +29,7 @@ export default {
                 .getAttribute("userId");
             localStorage.setItem("postId", postId);
             localStorage.setItem("userId", userId);
-
+            window.scrollTo({ top: 0 });
             console.log(post, comm, postId);
         },
         envoyer(e) {
@@ -48,17 +50,17 @@ export default {
                 body: dataForm,
             })
                 .then((res) => {
+                    this.$emit("updatePost", id, dataForm.get("commentaire"));
                     if (res.status !== 200) {
                         alert(
                             "Vous n'avez pas la permission de modifier cette publication."
                         );
-                    } else {
-                        this.$emit("addPost", res.json());
                     }
                 })
                 .catch((error) => console.error(error));
         },
         suppPublication(e) {
+            console.log("test");
             const element = e.target;
             const post = element.closest("#container2");
             const postId = post
@@ -68,16 +70,18 @@ export default {
                 .querySelector(".infoPublic")
                 .getAttribute("userId");
 
-            const formData = new FormData();
-            formData.append("userId", userId);
-            console.log(formData.get("userId"));
+            const formData = {
+                userId: userId,
+            };
 
             fetch(`http://localhost:3000/api/publication/${postId}`, {
                 method: "DELETE",
                 headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
                     Authorization: "Bearer " + localStorage.getItem("token"),
                 },
-                body: formData,
+                body: JSON.stringify(formData),
             })
                 .then((res) => {
                     if (res.status != 200) {
@@ -85,84 +89,102 @@ export default {
                             "Vous n'avez pas la permission de supprimer cette publication"
                         );
                     } else {
-                        this.posts.splice(
-                            this.posts.findIndex((post) => post._id === id),
-                            1
+                        const index = this.posts.findIndex(
+                            (post) => post._id === postId
                         );
+
+                        this.$emit("deletePost", index);
                     }
                 })
                 .catch((error) => {
                     console.log(error);
                 });
         },
+        closeModif() {
+            this.isopen = false;
+        },
         likes(e) {
-            e.target.class === "like"
-                ? (e.target.class = "noLiked")
-                : (e.target.class = "like");
-            console.log(e.target.class);
-            this.like = e.target.class === "like" ? 1 : 0;
             const element = e.target;
             const post = element.closest("#container2");
             const postId = post
                 .querySelector(".infoPublic")
                 .getAttribute("postId");
 
-            localStorage.setItem("postId", postId);
-            const id = localStorage.getItem("postId");
-            const dataForm = new FormData();
-            dataForm.append("likes", this.like);
-
-            fetch(`http://localhost:3000/api/publication/like/${id}`, {
+            const userId = localStorage.getItem("userId");
+            console.log(this.arrayLike);
+            // likeArray.include(userId) === null || true
+            //     ? (this.like = 0)
+            //     : (this.like = 1);
+            this.like = 1;
+            const dataForm = {
+                like: this.like,
+                userId: userId,
+            };
+            fetch(`http://localhost:3000/api/publication/like/${postId}`, {
                 method: "Post",
                 headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
                     Authorization: "Bearer " + localStorage.getItem("token"),
                 },
-                body: dataForm,
+                body: JSON.stringify(dataForm),
             })
                 .then((response) => {
                     return response.json();
                 })
-
+                .then(() => {
+                    this.$emit("likePost", postId, this.like);
+                })
                 .catch((error) => console.log(error));
-            console.log(dataForm.get("likes"));
         },
     },
 };
 </script>
 <template>
-    <form :class="isopen ? 'comm' : 'texte'" method="PUT">
-        <input type="text" v-model="comment" />
-        <input type="submit" @click="envoyer" />
+    <form :class="isopen ? 'commModif' : 'texte'" method="PUT">
+        <div class="inputModif">
+            <input type="text" v-model="comment" />
+            <input type="submit" @click="envoyer" />
+            <p class="closeModif" @click="closeModif">X</p>
+        </div>
     </form>
-
-    <section v-for="data in posts" id="container2" :key="data._id">
-        <div class="infoPublic" :postId="data._id" :userId="data.userId">
-            <h1>{{ data.name + " " + data.firstName }}</h1>
-            <p class="date">
-                {{ dayjs(data.date).format("DD-MM-YYYY hh:mm") }}
-            </p>
-        </div>
-        <div class="image">
-            <div class="comm" :com="commentaire">
-                {{ data.commentaire }}
+    <div class="postContainer">
+        <section v-for="data in posts" id="container2" :key="data._id">
+            <div
+                class="infoPublic"
+                :postId="data._id"
+                :userId="data.userId"
+                v-bind:arrayLike="['dzedzd', 'dzzdzd']"
+            >
+                <h1>{{ data.name + " " + data.firstName }}</h1>
+                <p class="date">
+                    {{ dayjs(data.date).format("DD-MM-YYYY hh:mm") }}
+                </p>
             </div>
-            <img class="images" :src="data.image" alt="images" />
-        </div>
-        <div class="detailpost">
-            <div @click="modifPublication" class="modifier">modifier</div>
-            <div @click="suppPublication" class="supprimer">supprimer</div>
-            <font-awesome-icon
-                icon="fa-regular fa-heart"
-                class="noLike"
-                @click="likes"
-            />
-        </div>
-    </section>
+            <div class="image">
+                <div class="comm" :com="commentaire">
+                    {{ data.commentaire }}
+                </div>
+                <img class="images" :src="data.image" alt="images" />
+            </div>
+            <div class="detailpost">
+                <div @click="modifPublication" class="modifier">modifier</div>
+                <div @click="suppPublication" class="supprimer">supprimer</div>
+                <font-awesome-icon
+                    icon="fa-regular fa-heart"
+                    class="noLike"
+                    @click="likes"
+                />
+                <p>{{ data.likes }}</p>
+            </div>
+        </section>
+    </div>
 </template>
 
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Lato&display=swap");
-
+.postContainer {
+}
 #container2 {
     display: flex;
     flex-direction: column;
@@ -223,5 +245,28 @@ export default {
     cursor: pointer;
     background-color: rgba(255, 215, 215, 0);
     border: none;
+}
+.commModif {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+.inputModif {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    background-color: rgba(255, 215, 215, 0.6);
+    margin-top: 20px;
+    margin-bottom: 0;
+    padding: 20px;
+    width: 30%;
+}
+.closeModif {
+    position: absolute;
+    cursor: pointer;
+    font-family: "Lato", sans-serif;
+    font-size: 20px;
+    top: 2px;
+    right: 2px;
 }
 </style>

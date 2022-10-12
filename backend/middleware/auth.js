@@ -12,7 +12,6 @@ module.exports = (req, res, next) => {
             userId: userId,
             role: role,
         };
-
         next();
     } catch (error) {
         res.status(401).json({ error });

@@ -18,10 +18,11 @@ import {
     faPaperPlane,
     faHeart,
     faShareFromSquare,
+    faCircleXmark,
 } from "@fortawesome/free-regular-svg-icons";
 
 /* add icons to the library */
-library.add(faImage, faPaperPlane, faHeart, faShareFromSquare);
+library.add(faImage, faPaperPlane, faHeart, faShareFromSquare, faCircleXmark);
 
 const router = createRouter({
     history: createWebHistory(),

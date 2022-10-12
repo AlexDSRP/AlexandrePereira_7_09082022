@@ -67,6 +67,7 @@ exports.modifyPublication = (req, res, next) => {
 };
 
 exports.deletePublication = (req, res, next) => {
+    console.log(req.body);
     if (req.auth.role == 2 || req.auth.userId == req.body.userId) {
         publication
             .deleteOne({ _id: req.params.id })
@@ -80,44 +81,49 @@ exports.deletePublication = (req, res, next) => {
 };
 
 exports.likePublication = (req, res) => {
-    console.log(req.body);
+    publication
+        .findOne({ _id: req.params.id })
+        .then((element) => {
+            //on supprime les users du array
+            const filtreLike = element.usersLiked.filter((user) => {
+                return user != req.body.userId;
+            });
 
-    // permet de retrouver la sauce exact dans la base de données
-    // publication
-    //     .findOne({ _id: req.params.id })
-    //     .then((element) => {
-    //         //on supprime les users du array
-    //         const filtreLike = element.usersLiked.filter((user) => {
-    //             return user != req.body.userId;
-    //         });
+            //On ajoute le like et dislike du user
+            if (req.body.like === 1) {
+                filtreLike.push(req.body.userId);
+            }
+            console.log(filtreLike);
 
-    //         //On ajoute le like et dislike du user
-    //         if (req.body.like === 1) {
-    //             filtreLike.push(req.body.userId);
-    //         } else if (req.body.like === 0) {
-    //             filtreDislike.push(req.body.userId);
-    //         }
+            //Maj de la taille du array user
+            element.likes = filtreLike.length; //sauvegarder l'élément(like,dislike)
 
-    //         //Maj de la taille du array user
-    //         element.likes = filtreLike.length;
-    //         element.dislikes = filtreDislike.length;
-
-    //         //sauvegarder l'élément(like,dislike)
-    //         publication
-    //             .updateOne(
-    //                 { _id: req.params.id },
-    //                 {
-    //                     likes: element.likes,
-    //                     dislikes: element.dislikes,
-    //                     usersLiked: filtreLike,
-    //                     usersDisliked: filtreDislike,
-    //                 }
-    //             )
-    //             .then(() => {
-    //                 res.status(200).json({
-    //                     message: "Like ajouté !",
-    //                 });
-    //             });
-    //     })
-    //     .catch((error) => res.status(401).json({ error }));
+            /*publication
+                .updateOne(
+                    { _id: req.params.id },
+                    {
+                        likes: element.likes,
+                        userLiked: filtreLike,
+                    }
+.then(() => {
+                    res.status(200).json({
+                        message: "Like ajouté !",
+                        
+                    }).cacth(error => console.log(error))
+                    });
+                }); */
+            publication
+                .updateOne(
+                    {
+                        _id: req.params.id,
+                    },
+                    {
+                        likes: element.likes,
+                        usersLiked: filtreLike,
+                    }
+                )
+                .then(() => res.status(200).json({ message: "Like ajouté!" }))
+                .catch((error) => res.status(404).json({ error }));
+        })
+        .catch((error) => res.status(401).json({ error }));
 };
