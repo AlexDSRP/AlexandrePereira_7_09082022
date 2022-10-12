@@ -6,7 +6,6 @@
             src="Images/icon-left-font.png"
             alt="logo de lentreprise"
         />
-        <button type="" class="deco">Deconnexion</button>
     </header>
 </template>
 <style scoped>

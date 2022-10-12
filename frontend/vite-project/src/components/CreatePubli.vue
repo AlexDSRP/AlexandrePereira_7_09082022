@@ -9,6 +9,10 @@ export default {
         };
     },
     methods: {
+        deconnexion() {
+            localStorage.clear();
+            this.$router.push("identification");
+        },
         imageForm(event) {
             this.image = event.target.files[0];
             console.log(this.image);
@@ -25,6 +29,8 @@ export default {
             dataForm.append("firstName", firstName);
             console.log(dataForm);
 
+            // la reponse de mon back c'est le post que je vais ajouter à mon array
+
             fetch("http://localhost:3000/api/publication", {
                 method: "Post",
                 headers: {
@@ -36,7 +42,7 @@ export default {
                     return response.json();
                 })
                 .then((data) => {
-                    console.log(data);
+                    this.$emit("createNewPosts", data.publication);
                 })
                 .catch((error) => console.log(error));
         },
@@ -45,6 +51,11 @@ export default {
 </script>
 <template>
     <form class="creerPubli" @submit="createPost" method="post">
+        <font-awesome-icon
+            icon="fa-regular fa-share-from-square"
+            class="fontDeco"
+            @click="deconnexion"
+        />
         <div class="bloc1">
             <label for="commentaires">
                 <input
@@ -88,8 +99,10 @@ export default {
 </template>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Lato&display=swap");
+
 .creerPubli {
     display: flex;
+    position: relative;
     flex-direction: column;
     background-color: rgba(255, 215, 215, 0.6);
     align-items: center;
@@ -143,5 +156,12 @@ export default {
 .text {
     font-family: "Lato", sans-serif;
     margin-right: 30px;
+}
+
+.fontDeco {
+    position: absolute;
+    right: 2rem;
+    top: 1rem;
+    font-size: 1.5em;
 }
 </style>

@@ -20,6 +20,6 @@ router.put(
     publicationCtrl.modifyPublication
 );
 router.delete("/publication/:id", midAuth, publicationCtrl.deletePublication);
-router.post("/publication/:id/like", midAuth, publicationCtrl.likePublication);
+router.post("/publication/like/:id", midAuth, publicationCtrl.likePublication);
 
 module.exports = router;

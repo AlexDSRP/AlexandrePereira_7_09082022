@@ -14,6 +14,7 @@ exports.signup = (req, res, next) => {
                 email: req.body.email,
                 password: hash,
             });
+            console.log(user);
             user.save()
                 .then(() =>
                     res.status(201).json({ message: "Utilisateur créé !" })
@@ -24,27 +25,30 @@ exports.signup = (req, res, next) => {
 };
 
 exports.login = (req, res, next) => {
-    console.log(req.body);
     User.findOne({ email: req.body.email })
         .then((user) => {
             console.log(user);
             bcrypt
                 .compare(req.body.password, user.password)
-                .then(() => {
-                    res.status(200).json({
-                        userId: user._id,
-                        name: user.name,
-                        firstName: user.firstName,
+                .then((valid) => {
+                    valid
+                        ? res.status(200).json({
+                              userId: user._id,
+                              name: user.name,
+                              firstName: user.firstName,
 
-                        token: jwt.sign(
-                            {
-                                userId: user._id,
-                                role: user.roleId,
-                            },
-                            process.env.TOKEN,
-                            { expiresIn: "24h" }
-                        ),
-                    });
+                              token: jwt.sign(
+                                  {
+                                      userId: user._id,
+                                      role: user.roleId,
+                                  },
+                                  process.env.TOKEN,
+                                  { expiresIn: "24h" }
+                              ),
+                          })
+                        : res
+                              .status(401)
+                              .json({ message: "Mot de passe incorrect" });
                 })
                 .catch((error) => res.status(500).json({ error }));
         })

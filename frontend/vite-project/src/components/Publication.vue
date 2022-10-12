@@ -5,32 +5,14 @@ export default {
     name: "Publication",
     data: function () {
         return {
-            posts: [],
             id: [],
             dayjs,
             isopen: false,
             comment: "",
-            like: 0,
+            like: "",
         };
     },
-
-    //faire un fetch pour recuperer le post
-    //fetch("http://localhost:3000/api/publication")
-    mounted() {
-        fetch("http://localhost:3000/api/publication", {
-            headers: {
-                Authorization: "Bearer " + localStorage.getItem("token"),
-            },
-        })
-            .then((response) => {
-                return response.json();
-            })
-            .then((data) => {
-                console.log(data);
-                this.posts = data;
-            })
-            .catch((error) => console.log(error));
-    },
+    props: ["posts"],
     methods: {
         modifPublication(e) {
             this.isopen = !this.isopen;
@@ -40,73 +22,124 @@ export default {
             const postId = post
                 .querySelector(".infoPublic")
                 .getAttribute("postId");
+            const userId = post
+                .querySelector(".infoPublic")
+                .getAttribute("userId");
             localStorage.setItem("postId", postId);
+            localStorage.setItem("userId", userId);
 
             console.log(post, comm, postId);
         },
         envoyer(e) {
             e.preventDefault();
+            console.log(localStorage.getItem("token"));
             const id = localStorage.getItem("postId");
+            const userId = localStorage.getItem("userId");
             const dataForm = new FormData();
+            dataForm.append("userId", userId);
             dataForm.append("commentaire", this.comment);
-            console.log(dataForm);
+            console.log(id);
+
             fetch(`http://localhost:3000/api/publication/${id}`, {
                 method: "PUT",
                 headers: {
-                    "Content-type": "application/json",
-                    Authorization: "Bearer" + localStorage.getItem("token"),
-                },
-                body: dataForm,
-            });
-        },
-        /*suppPublication() {
-            const id = localStorage.getItem("postId");
-            const dataForm = new FormData();
-            dataForm.append("commentaire", this.commentaire);
-            dataForm.append("image", this.image);
-            console.log(dataForm);
-            fetch(`http://localhost:3000/api/publication/${id}`, {
-                method: "DELETE",
-                headers: {
-                    "Content-type": "application/json",
-                    Authorization: "Bearer" + localStorage.getItem("token"),
+                    Authorization: "Bearer " + localStorage.getItem("token"),
                 },
                 body: dataForm,
             })
-                .then(localStorage.clear())
-                .then(this.$router.push("Accueil"))
+                .then((res) => {
+                    if (res.status !== 200) {
+                        alert(
+                            "Vous n'avez pas la permission de modifier cette publication."
+                        );
+                    } else {
+                        this.$emit("addPost", res.json());
+                    }
+                })
+                .catch((error) => console.error(error));
+        },
+        suppPublication(e) {
+            const element = e.target;
+            const post = element.closest("#container2");
+            const postId = post
+                .querySelector(".infoPublic")
+                .getAttribute("postId");
+            const userId = post
+                .querySelector(".infoPublic")
+                .getAttribute("userId");
+
+            const formData = new FormData();
+            formData.append("userId", userId);
+            console.log(formData.get("userId"));
+
+            fetch(`http://localhost:3000/api/publication/${postId}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: "Bearer " + localStorage.getItem("token"),
+                },
+                body: formData,
+            })
+                .then((res) => {
+                    if (res.status != 200) {
+                        alert(
+                            "Vous n'avez pas la permission de supprimer cette publication"
+                        );
+                    } else {
+                        this.posts.splice(
+                            this.posts.findIndex((post) => post._id === id),
+                            1
+                        );
+                    }
+                })
                 .catch((error) => {
-                    error;
+                    console.log(error);
                 });
-        },*/
-        likes() {
+        },
+        likes(e) {
+            e.target.class === "like"
+                ? (e.target.class = "noLiked")
+                : (e.target.class = "like");
+            console.log(e.target.class);
+            this.like = e.target.class === "like" ? 1 : 0;
+            const element = e.target;
+            const post = element.closest("#container2");
+            const postId = post
+                .querySelector(".infoPublic")
+                .getAttribute("postId");
+
+            localStorage.setItem("postId", postId);
             const id = localStorage.getItem("postId");
             const dataForm = new FormData();
             dataForm.append("likes", this.like);
-            console.log(like);
-            fetch(`http://localhost:3000/api/publication/${id}/like`, {
-                method: "POST",
+
+            fetch(`http://localhost:3000/api/publication/like/${id}`, {
+                method: "Post",
                 headers: {
-                    "Content-type": "application/json",
-                    Authorization: "Bearer" + localStorage.getItem("token"),
+                    Authorization: "Bearer " + localStorage.getItem("token"),
                 },
                 body: dataForm,
-            });
+            })
+                .then((response) => {
+                    return response.json();
+                })
+
+                .catch((error) => console.log(error));
+            console.log(dataForm.get("likes"));
         },
     },
 };
 </script>
 <template>
-    <form :class="isopen ? 'comm' : 'texte'">
+    <form :class="isopen ? 'comm' : 'texte'" method="PUT">
         <input type="text" v-model="comment" />
-        <input type="submit" @submit="envoyer" />
+        <input type="submit" @click="envoyer" />
     </form>
 
-    <section v-for="data in posts" id="container2">
-        <div class="infoPublic" :postId="data._id">
-            <h1>{{ data.name }}</h1>
+    <section v-for="data in posts" id="container2" :key="data._id">
+        <div class="infoPublic" :postId="data._id" :userId="data.userId">
+            <h1>{{ data.name + " " + data.firstName }}</h1>
             <p class="date">
-                {{ dayjs(data.date).format("DD-MM-YYYY mm:ss") }}
+                {{ dayjs(data.date).format("DD-MM-YYYY hh:mm") }}
             </p>
         </div>
         <div class="image">
@@ -118,9 +151,11 @@ export default {
         <div class="detailpost">
             <div @click="modifPublication" class="modifier">modifier</div>
             <div @click="suppPublication" class="supprimer">supprimer</div>
-            <button type="submit" class="like" @click="likes">
-                <font-awesome-icon icon="fa-regular fa-heart" />
-            </button>
+            <font-awesome-icon
+                icon="fa-regular fa-heart"
+                class="noLike"
+                @click="likes"
+            />
         </div>
     </section>
 </template>

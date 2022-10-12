@@ -1,9 +1,8 @@
 <script>
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
 import Header from "../components/Header.vue";
 import Connexion from "../components/Connexion.vue";
 import Inscription from "../components/Inscription.vue";
+
 export default {
     components: {
         Header,
@@ -14,7 +13,7 @@ export default {
 </script>
 
 <template>
-    <body>
+    <div class="body">
         <div class="identification">
             <header>
                 <Header />
@@ -24,11 +23,11 @@ export default {
                 <Inscription />
             </section>
         </div>
-    </body>
+    </div>
 </template>
 
 <style>
-body {
+.body {
     background-image: url(images/fondProjet7.jpeg);
     height: 100vh;
     width: 100%;

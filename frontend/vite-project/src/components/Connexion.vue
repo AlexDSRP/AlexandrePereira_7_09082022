@@ -10,14 +10,11 @@ export default {
         };
     },
 
-    computed: {},
-
     //ensuite je fais une methodes avec la fonction "createAccount()"
     //dans ma fonction je ferai un fetch
     methods: {
         connexionAccount(event) {
             event.preventDefault();
-            //const descriptionForm = document.querySelector(".bloc1co");
             const formData = {
                 email: this.email,
                 password: this.motDePasse,
@@ -28,14 +25,16 @@ export default {
                 body: JSON.stringify(formData),
             })
                 .then((response) => {
-                    if (response.status === 200) {
-                        this.$router.push({ name: "Accueil" });
-                    }
                     return response.json();
                 })
                 .then((data) => {
-                    console.log(data);
                     localStorage.setItem("token", data.token);
+                    localStorage.setItem("name", data.name);
+                    localStorage.setItem("firstName", data.firstName);
+                    localStorage.setItem("userId", data.userId);
+                    if (data.token != undefined) {
+                        this.$router.push("accueil");
+                    }
                 })
                 .catch((error) => console.log(error));
         },
