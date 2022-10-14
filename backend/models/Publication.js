@@ -9,6 +9,7 @@ const publicationSchema = mongoose.Schema({
     date: { type: String, required: true },
     name: { type: String, required: true },
     firstName: { type: String, required: true },
+    isLiked: { type: Boolean, required: false },
 });
 
 module.exports = mongoose.model("Publication", publicationSchema);

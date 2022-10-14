@@ -16,14 +16,22 @@ export default {
     },
 
     methods: {
-        likePost(id, like) {
-            this.posts.filter((post) => {
-                if (post._id === id) {
-                    console.log(post._id === id);
-                    post.likes += like;
-                    console.log(post.usersLiked.length);
-                }
-            });
+        likePost(index, like, userId) {
+            if (like === 1) {
+                this.posts[index].usersLiked.push(userId);
+                this.posts[index].likes += like;
+                this.posts[index].isLiked = true;
+            } else {
+                this.posts[index].usersLiked.filter((user) => {
+                    if (user === userId) {
+                        const userIndex =
+                            this.posts[index].usersLiked.indexOf(user);
+                        this.posts[index].usersLiked.splice(userIndex, 1);
+                        this.posts[index].likes += like;
+                        this.posts[index].isLiked = false;
+                    }
+                });
+            }
         },
         addPosts(newPost) {
             this.posts.push(newPost);
@@ -49,6 +57,7 @@ export default {
         if (localStorage.getItem("token") === null) {
             this.$router.push("identification");
         } else {
+            const userId = localStorage.getItem("userId");
             fetch("http://localhost:3000/api/publication", {
                 headers: {
                     Authorization: "Bearer " + localStorage.getItem("token"),
@@ -58,7 +67,16 @@ export default {
                     return response.json();
                 })
                 .then((data) => {
-                    this.posts = data;
+                    const newData = [];
+                    data.forEach((post) => {
+                        post = {
+                            ...post,
+                            isLiked: post.usersLiked.includes(userId),
+                        };
+                        newData.push(post);
+                    });
+                    this.posts = newData;
+
                     this.posts.sort(function sortByDate(a, b) {
                         return new Date(b.date) - new Date(a.date);
                     });

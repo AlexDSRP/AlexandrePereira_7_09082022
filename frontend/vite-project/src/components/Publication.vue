@@ -10,7 +10,6 @@ export default {
             isopen: false,
             comment: "",
             like: "",
-            arrayLike: null,
         };
     },
 
@@ -104,18 +103,23 @@ export default {
             this.isopen = false;
         },
         likes(e) {
+            const userId = localStorage.getItem("userId");
             const element = e.target;
             const post = element.closest("#container2");
             const postId = post
                 .querySelector(".infoPublic")
                 .getAttribute("postId");
 
-            const userId = localStorage.getItem("userId");
-            console.log(this.arrayLike);
-            // likeArray.include(userId) === null || true
-            //     ? (this.like = 0)
-            //     : (this.like = 1);
-            this.like = 1;
+            const index = this.posts.findIndex((post) => post._id === postId);
+
+            const arrayLike = JSON.parse(
+                JSON.stringify(this.posts[index].usersLiked)
+            );
+
+            arrayLike.includes(userId) ? (this.like = -1) : (this.like = 1);
+
+            console.log(this.like);
+
             const dataForm = {
                 like: this.like,
                 userId: userId,
@@ -133,7 +137,7 @@ export default {
                     return response.json();
                 })
                 .then(() => {
-                    this.$emit("likePost", postId, this.like);
+                    this.$emit("likePost", index, this.like, userId);
                 })
                 .catch((error) => console.log(error));
         },
@@ -150,13 +154,10 @@ export default {
     </form>
     <div class="postContainer">
         <section v-for="data in posts" id="container2" :key="data._id">
-            <div
-                class="infoPublic"
-                :postId="data._id"
-                :userId="data.userId"
-                v-bind:arrayLike="['dzedzd', 'dzzdzd']"
-            >
-                <h1>{{ data.name + " " + data.firstName }}</h1>
+            <div class="infoPublic" :postId="data._id" :userId="data.userId">
+                <h1 :usersLiked="usersLiked" class="nameinfo">
+                    {{ data.name + " " + data.firstName }}
+                </h1>
                 <p class="date">
                     {{ dayjs(data.date).format("DD-MM-YYYY hh:mm") }}
                 </p>
@@ -171,8 +172,15 @@ export default {
                 <div @click="modifPublication" class="modifier">modifier</div>
                 <div @click="suppPublication" class="supprimer">supprimer</div>
                 <font-awesome-icon
+                    v-if="data.isLiked === false"
                     icon="fa-regular fa-heart"
                     class="noLike"
+                    @click="likes"
+                />
+                <font-awesome-icon
+                    v-if="data.isLiked === true"
+                    icon="fa-regular fa-heart"
+                    class="like"
                     @click="likes"
                 />
                 <p>{{ data.likes }}</p>
@@ -183,8 +191,7 @@ export default {
 
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Lato&display=swap");
-.postContainer {
-}
+
 #container2 {
     display: flex;
     flex-direction: column;
@@ -208,6 +215,7 @@ export default {
 }
 .comm {
     font-family: "Lato", sans-serif;
+    font-size: 1.5rem;
 }
 .texte {
     display: none;
@@ -230,6 +238,7 @@ export default {
     padding: 5px 10px 5px 10px;
     border-radius: 5px;
     cursor: pointer;
+    color: white;
 }
 .supprimer {
     background-color: #4e5166;
@@ -237,9 +246,10 @@ export default {
     padding: 5px 10px 5px 10px;
     border-radius: 5px;
     cursor: pointer;
+    color: white;
 }
 .like {
-    color: rgb(47, 48, 60);
+    color: red;
     margin-top: 4px;
     font-size: 1.5em;
     cursor: pointer;
@@ -268,5 +278,10 @@ export default {
     font-size: 20px;
     top: 2px;
     right: 2px;
+}
+.noLike {
+    font-size: 1.5rem;
+    margin-top: 3px;
+    cursor: pointer;
 }
 </style>

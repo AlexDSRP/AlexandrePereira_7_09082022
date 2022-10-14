@@ -146,6 +146,7 @@ export default {
 .iconeimg {
     font-size: 25px;
     margin: 5% 10% 5% 10%;
+    color: white;
 }
 #bouton {
     display: none;
@@ -156,6 +157,7 @@ export default {
 .text {
     font-family: "Lato", sans-serif;
     margin-right: 30px;
+    color: white;
 }
 
 .fontDeco {
